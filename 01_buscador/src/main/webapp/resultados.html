@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<div th:each="it:${direcciones}">
+	<h3><a th:href="${it.url}" th:text="${it.url}"></a></h3>
+	<h4 th:text="${it.descripcion}"></h4>
+	<hr>
+</div>
+
+</body>
+</html>
