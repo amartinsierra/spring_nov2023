@@ -1,12 +1,13 @@
 package com.estudiantes.service;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,6 +19,15 @@ import com.estudiantes.model.Estudiante;
 public class EstudiantesServiceImpl implements EstudiantesService {
 	@Autowired
 	WebClient webClient;
+	@Value("${user.basic}")
+	String userBasic;
+	@Value("${password.basic}")
+	String pwdBasic;
+	@Value("${user.admin}")
+	String userAdmin;
+	@Value("${password.admin}")
+	String pwdAdmin;
+	
 	
 	String urlBase="http://localhost:9000/formacion/";
 
@@ -29,6 +39,7 @@ public class EstudiantesServiceImpl implements EstudiantesService {
 			webClient
 				.post() //RequestBodyUriSpec
 				.uri(urlBase+"alta")  //RequestBodySpec
+				.header("Authorization", "Basic "+getBase64Encoded(userAdmin,pwdAdmin))
 				.contentType(MediaType.APPLICATION_JSON) //RequestBodySpec
 				//.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 				//.body(BodyInserters.fromFormData("username", "SOME-USERNAME")
@@ -49,6 +60,7 @@ public class EstudiantesServiceImpl implements EstudiantesService {
 		Estudiante[] estudiantes=webClient
 			.get()
 			.uri(urlBase+"alumnos")
+			.header("Authorization", "Basic "+getBase64Encoded(userBasic,pwdBasic))
 			.retrieve()
 			.bodyToMono(Estudiante[].class)
 			.block(); //Estudiante[]
@@ -71,6 +83,11 @@ public class EstudiantesServiceImpl implements EstudiantesService {
 			.retrieve()
 			.bodyToMono(Estudiante.class)
 			.block();
+	}
+	
+	private String getBase64Encoded(String user, String pwd) {
+		String cad=user+":"+pwd;
+		return Base64.getEncoder().encodeToString(cad.getBytes());
 	}
 
 }
